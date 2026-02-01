@@ -1,11 +1,16 @@
 import { GoogleGenAI } from "@google/genai";
 import { Transaction } from '../types';
 
-// Initialize Gemini Client
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
 export const getFinancialAdvice = async (transactions: Transaction[]): Promise<string> => {
   try {
+    const apiKey = process.env.API_KEY;
+    if (!apiKey) {
+      return "API Key is missing. Please configure it in your environment variables.";
+    }
+
+    // Initialize Gemini Client inside the function
+    const ai = new GoogleGenAI({ apiKey: apiKey });
+
     // Prepare a summarized prompt to avoid token limits if many transactions
     const transactionSummary = JSON.stringify(transactions.slice(0, 50)); // Analyze last 50 for speed
 
