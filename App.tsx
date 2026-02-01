@@ -145,7 +145,7 @@ const MainApp: React.FC = () => {
               <Wallet size={20} className="sm:w-6 sm:h-6" />
             </div>
             <h1 className="text-lg sm:text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400 tracking-tight">
-              {language === 'en' ? 'Gopa' : 'গপা'}<span className="text-indigo-600 dark:text-indigo-400">{language === 'en' ? '-Gop' : '-গপ'}</span>
+              {language === 'en' ? 'Hisab' : 'হিসাব'}
             </h1>
           </div>
           

@@ -2,7 +2,7 @@ import { Language } from '../types';
 
 export const translations = {
   en: {
-    appTitle: 'Gopa-Gop',
+    appTitle: 'Hisab',
     dashboard: 'Dashboard',
     history: 'History',
     addNew: 'Add New',
@@ -39,7 +39,7 @@ export const translations = {
     confirmDelete: 'Are you sure you want to delete this record?'
   },
   bn: {
-    appTitle: 'গপা-গপ',
+    appTitle: 'হিসাব',
     dashboard: 'ড্যাশবোর্ড',
     history: 'ইতিহাস',
     addNew: 'নতুন যোগ করুন',

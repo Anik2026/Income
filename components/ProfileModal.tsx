@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { X, Save, User as UserIcon, Check } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { X, Save, User as UserIcon, Check, Upload, Image as ImageIcon } from 'lucide-react';
 import { useSettings } from '../contexts/SettingsContext';
 import { User } from '../types';
 
@@ -23,6 +23,7 @@ const PRESET_AVATARS = [
 const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, user, onUpdate }) => {
   const [avatarUrl, setAvatarUrl] = useState(user.avatarUrl || '');
   const [loading, setLoading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { language } = useSettings();
 
   if (!isOpen) return null;
@@ -34,9 +35,51 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, user, onUp
     onClose();
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Read and resize image
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        // Resize to max 300px width/height to save space
+        const MAX_SIZE = 300;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > MAX_SIZE) {
+            height *= MAX_SIZE / width;
+            width = MAX_SIZE;
+          }
+        } else {
+          if (height > MAX_SIZE) {
+            width *= MAX_SIZE / height;
+            height = MAX_SIZE;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx?.drawImage(img, 0, 0, width, height);
+        
+        // Convert to Base64 string (JPEG 70% quality)
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+        setAvatarUrl(dataUrl);
+      };
+      img.src = event.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+  };
+
   const t = {
     title: language === 'bn' ? 'প্রোফাইল আপডেট' : 'Update Profile',
     urlLabel: language === 'bn' ? 'ছবির লিঙ্ক (URL)' : 'Image URL',
+    uploadBtn: language === 'bn' ? 'ছবি আপলোড করুন' : 'Upload Photo',
     placeholder: language === 'bn' ? 'ছবির লিঙ্ক পেস্ট করুন...' : 'Paste image link...',
     presets: language === 'bn' ? 'অথবা একটি বেছে নিন' : 'Or choose a preset',
     save: language === 'bn' ? 'সংরক্ষণ' : 'Save Changes',
@@ -56,23 +99,56 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, user, onUp
         </div>
 
         <div className="p-6 space-y-6">
-          {/* Preview */}
-          <div className="flex justify-center">
-            <div className="relative w-24 h-24 rounded-full border-4 border-indigo-100 dark:border-indigo-900/50 overflow-hidden shadow-lg">
+          {/* Preview & Upload */}
+          <div className="flex flex-col items-center gap-4">
+            <div className="relative w-28 h-28 rounded-full border-4 border-indigo-100 dark:border-indigo-900/50 overflow-hidden shadow-lg group">
               {avatarUrl ? (
                 <img src={avatarUrl} alt="Profile" className="w-full h-full object-cover" />
               ) : (
                 <div className="w-full h-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-400">
-                  <UserIcon size={40} />
+                  <UserIcon size={48} />
                 </div>
               )}
+              
+              {/* Overlay Upload Button */}
+              <button 
+                onClick={() => fileInputRef.current?.click()}
+                className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer text-white font-medium text-xs"
+              >
+                <Upload size={24} className="mb-1" />
+                {t.uploadBtn}
+              </button>
+            </div>
+            
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              onChange={handleFileChange} 
+              accept="image/*" 
+              className="hidden" 
+            />
+
+            <button 
+              onClick={() => fileInputRef.current?.click()}
+              className="flex items-center gap-2 text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 bg-indigo-50 dark:bg-indigo-900/20 px-4 py-2 rounded-lg transition-colors"
+            >
+              <Upload size={16} /> {t.uploadBtn}
+            </button>
+          </div>
+
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-200 dark:border-gray-700"></div>
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-white dark:bg-gray-800 px-2 text-gray-500 dark:text-gray-400">OR</span>
             </div>
           </div>
 
           {/* Custom URL Input */}
           <div>
-            <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-2">
-              {t.urlLabel}
+            <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-2 flex items-center gap-2">
+              <ImageIcon size={14} /> {t.urlLabel}
             </label>
             <input
               type="text"
