@@ -1,3 +1,4 @@
+
 import React from 'react';
 
 interface CardProps {
@@ -9,22 +10,26 @@ interface CardProps {
 const Card: React.FC<CardProps> = ({ children, className = '', title }) => {
   return (
     <div className={`
-      bg-white dark:bg-gray-800 
-      rounded-2xl 
-      shadow-[0_10px_20px_rgba(0,0,0,0.05),0_6px_6px_rgba(0,0,0,0.1)] 
-      dark:shadow-[0_10px_20px_rgba(0,0,0,0.2),0_6px_6px_rgba(0,0,0,0.2)]
-      border border-gray-100 dark:border-gray-700
-      transform transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1),0_10px_10px_-5px_rgba(0,0,0,0.04)]
+      glass-card
+      rounded-3xl
+      transform transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_40px_-10px_rgba(0,0,0,0.1)]
       overflow-hidden
+      group
       ${className}
     `}>
       {title && (
-        <div className="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-50 dark:border-gray-700">
-          <h3 className="text-base sm:text-lg font-bold text-gray-800 dark:text-white">{title}</h3>
+        <div className="px-5 py-4 sm:px-8 sm:py-5 border-b border-gray-200/50 dark:border-gray-700/50 bg-white/30 dark:bg-black/20 backdrop-blur-sm">
+          <h3 className="text-lg sm:text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-800 to-gray-600 dark:from-white dark:to-gray-300">
+            {title}
+          </h3>
         </div>
       )}
-      <div className="p-4 sm:p-6 text-gray-800 dark:text-gray-200">
-        {children}
+      <div className="p-5 sm:p-8 text-gray-800 dark:text-gray-200 relative">
+        {/* Subtle decorative gradient blob inside card */}
+        <div className="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none group-hover:bg-indigo-500/10 transition-colors duration-700"></div>
+        <div className="relative z-10">
+          {children}
+        </div>
       </div>
     </div>
   );
